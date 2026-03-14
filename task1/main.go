@@ -18,14 +18,27 @@ type RepoInfo struct {
 	CreatedAt   string `json:"created_at"`
 }
 
-func main() {
+func (result RepoInfo) String() string {
+	createdAt := makeDate(result.CreatedAt)
 
+	return fmt.Sprintf(`--- Repository Information ---
+Name:          %s
+Description:   %s
+Stars:         %d
+Forks:         %d
+Created At:    %s
+`, result.Name, result.Description, result.Stars, result.Forks, createdAt)
+}
+
+func main() {
 	owner, repo := parseFlags()
+
 	result, err := fetchRepoInfo(owner, repo)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
-	printInfo(result)
+
+	fmt.Println(result)
 }
 
 func parseFlags() (string, string) {
@@ -60,19 +73,6 @@ func fetchRepoInfo(owner, repo string) (*RepoInfo, error) {
 	}
 
 	return &result, nil
-}
-
-func printInfo(result *RepoInfo) {
-	createdAt := makeDate(result.CreatedAt)
-
-	fmt.Printf(`--- Repository Information ---
-Name:          %s
-Description:   %s
-Stars:         %d
-Forks:         %d
-Created At:    %s
-`, result.Name, result.Description, result.Stars, result.Forks, createdAt)
-
 }
 
 func makeDate(raw string) string {
