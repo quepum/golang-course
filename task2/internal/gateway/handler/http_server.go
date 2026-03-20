@@ -13,9 +13,7 @@ type HttpServer struct {
 }
 
 func NewHTTPServer(uc domain.UseCase) *HttpServer {
-	return &HttpServer{
-		uc: uc,
-	}
+	return &HttpServer{uc: uc}
 }
 
 // GetRepoInfo retrieves information about a GitHub repository.

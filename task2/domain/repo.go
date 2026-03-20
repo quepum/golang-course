@@ -21,6 +21,7 @@ type UseCase interface {
 	GetRepoInfo(ctx context.Context, owner, repo string) (*RepoInfo, error)
 }
 
-var ErrRepoNotFound = errors.New("repo not found")
-
-var ErrInvalidInput = errors.New("invalid input")
+var (
+	ErrRepoNotFound = errors.New("repo not found")
+	ErrInvalidInput = errors.New("invalid input")
+)
