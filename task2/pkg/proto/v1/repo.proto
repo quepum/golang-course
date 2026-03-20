@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "task2/pkg/proto/pb";
+
+message RepoRequest {
+  string owner = 1;
+  string repo = 2;
+}
+
+message RepoResponse {
+  string name = 1;
+  string description = 2;
+  int32 stars = 3;
+  int32 forks = 4;
+  string created_at = 5;
+}
+
+service RepoService {
+  rpc GetRepoInfo (RepoRequest) returns (RepoResponse);
+}
