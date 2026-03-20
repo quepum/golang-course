@@ -3,9 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
+	_ "task2/docs/swagger"
 	"task2/internal/gateway/adapter"
 	"task2/internal/gateway/handler"
 	"task2/internal/gateway/usecase"
+
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -34,6 +37,8 @@ func main() {
 	httpHandler := handler.NewHTTPServer(uc)
 
 	http.HandleFunc("/repos/", httpHandler.GetRepoInfo)
+	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+
 	log.Printf("Gateway starting on %s", httpPort)
 	if err := http.ListenAndServe(httpPort, nil); err != nil {
 		log.Fatal(err)

@@ -18,6 +18,19 @@ func NewHTTPServer(uc domain.UseCase) *HttpServer {
 	}
 }
 
+// GetRepoInfo retrieves information about a GitHub repository.
+// @Summary      Get repository information
+// @Description  Retrieves detailed information about a GitHub repository including name, description, stars, forks, and creation date.
+// @Tags         repos
+// @Accept       json
+// @Produce      json
+// @Param        owner  path      string  true  "Repository Owner username (e.g. golang)"
+// @Param        repo   path      string  true  "Repository Name (e.g. go)"
+// @Success      200    {object}  domain.RepoInfo  "Successful response with repository details"
+// @Failure      400    {string}  string           "Invalid input parameters: owner or repo is empty"
+// @Failure      404    {string}  string           "Repository not found on GitHub"
+// @Failure      500    {string}  string           "Internal server error: failed to fetch data from collector"
+// @Router       /repos/{owner}/{repo} [get]
 func (h *HttpServer) GetRepoInfo(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
