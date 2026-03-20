@@ -6,6 +6,7 @@ import (
 	pb "task2/pkg/proto/v1"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
@@ -23,9 +24,9 @@ func (c *collectorClient) GetRepoInfo(ctx context.Context, owner, repo string) (
 	if err != nil {
 		if s, ok := status.FromError(err); ok {
 			switch s.Code() {
-			case 3:
+			case codes.InvalidArgument:
 				return nil, domain.ErrInvalidInput
-			case 5:
+			case codes.NotFound:
 				return nil, domain.ErrRepoNotFound
 			default:
 				return nil, err
@@ -36,11 +37,11 @@ func (c *collectorClient) GetRepoInfo(ctx context.Context, owner, repo string) (
 	}
 
 	info := &domain.RepoInfo{
-		Name:        response.Name,
-		Description: response.Description,
-		Stars:       int(response.Stars),
-		Forks:       int(response.Forks),
-		CreatedAt:   response.CreatedAt,
+		Name:        response.GetName(),
+		Description: response.GetDescription(),
+		Stars:       int(response.GetStars()),
+		Forks:       int(response.GetForks()),
+		CreatedAt:   response.GetCreatedAt(),
 	}
 
 	return info, nil

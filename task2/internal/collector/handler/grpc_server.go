@@ -20,7 +20,7 @@ func NewGrpcServer(uc domain.UseCase) *GrpcServer {
 }
 
 func (s *GrpcServer) GetRepoInfo(ctx context.Context, req *pb.RepoRequest) (*pb.RepoResponse, error) {
-	info, err := s.uc.GetRepoInfo(ctx, req.Owner, req.Repo)
+	info, err := s.uc.GetRepoInfo(ctx, req.GetOwner(), req.GetRepo())
 	if err != nil {
 		if errors.Is(err, domain.ErrRepoNotFound) {
 			return nil, status.Error(codes.NotFound, "repository not found")

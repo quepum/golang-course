@@ -8,8 +8,8 @@ import (
 type RepoInfo struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	Stars       int    `json:"stargazers_count"`
-	Forks       int    `json:"forks_count"`
+	Stars       int    `json:"stars"`
+	Forks       int    `json:"forks"`
 	CreatedAt   string `json:"created_at"`
 }
 
