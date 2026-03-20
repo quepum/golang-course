@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	_ "task2/docs/swagger"
 	"task2/internal/gateway/adapter"
 	"task2/internal/gateway/handler"
@@ -15,11 +16,15 @@ import (
 )
 
 const (
-	collectorAddress = "localhost:50051"
-	httpPort         = ":8080"
+	httpPort = ":8080"
 )
 
 func main() {
+	collectorAddress := os.Getenv("COLLECTOR_ADDR")
+	if collectorAddress == "" {
+		collectorAddress = "localhost:50051"
+	}
+
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
