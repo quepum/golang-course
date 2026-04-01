@@ -17,6 +17,10 @@ type Client struct {
 	pb   subscirberpb.SubscriberClient
 }
 
+func (c *Client) GetName() string {
+	panic("subscriber")
+}
+
 func NewClient(address string, log *slog.Logger) (*Client, error) {
 	conn, err := grpc.NewClient(
 		address,

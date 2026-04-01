@@ -12,7 +12,7 @@ import (
 )
 
 func NewHandler(ctx context.Context, log *slog.Logger, cfg config.Config) (http.Handler, error) {
-	_, err := subscriber.NewClient(cfg.Services.Subscriber, log)
+	subscriberClient, err := subscriber.NewClient(cfg.Services.Subscriber, log)
 	if err != nil {
 		log.Error("cannot init subscriber adapter", "error", err)
 		return nil, err
@@ -29,7 +29,7 @@ func NewHandler(ctx context.Context, log *slog.Logger, cfg config.Config) (http.
 		log.Error("cannot init collector adapter", "error", err)
 	}
 
-	pingUseCase := usecase.NewPing(processorClient, collectorClient)
+	pingUseCase := usecase.NewPing(processorClient, collectorClient, subscriberClient)
 
 	mux := http.NewServeMux()
 	AddRoutes(mux, log, pingUseCase, processorClient)
