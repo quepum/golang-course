@@ -18,7 +18,7 @@ type Client struct {
 }
 
 func (c *Client) GetName() string {
-	panic("subscriber")
+	return "subscriber"
 }
 
 func NewClient(address string, log *slog.Logger) (*Client, error) {
