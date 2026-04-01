@@ -7,4 +7,5 @@ import (
 
 type SubscriberPinger interface {
 	Ping(ctx context.Context) (domain.PingStatus, error)
+	GetName() string
 }

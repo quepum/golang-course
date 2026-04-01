@@ -9,4 +9,4 @@ logger:
   log_level: "DEBUG"
 
 services:
-  api: "localhost:8082"
+  api: "localhost:8083"

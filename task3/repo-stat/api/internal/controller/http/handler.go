@@ -5,18 +5,31 @@ import (
 	"log/slog"
 	"net/http"
 	"repo-stat/api/config"
+	"repo-stat/api/internal/adapter/collector"
+	"repo-stat/api/internal/adapter/processor"
 	"repo-stat/api/internal/adapter/subscriber"
 	"repo-stat/api/internal/usecase"
 )
 
 func NewHandler(ctx context.Context, log *slog.Logger, cfg config.Config) (http.Handler, error) {
-	subscriberClient, err := subscriber.NewClient(cfg.Services.Subscriber, log)
+	_, err := subscriber.NewClient(cfg.Services.Subscriber, log)
 	if err != nil {
 		log.Error("cannot init subscriber adapter", "error", err)
 		return nil, err
 	}
 
-	pingUseCase := usecase.NewPing(subscriberClient)
+	processorClient, err := processor.NewClient(cfg.Services.Processor, log)
+	if err != nil {
+		log.Error("cannot init processor adapter", "error", err)
+		return nil, err
+	}
+
+	collectorClient, err := collector.NewClient(cfg.Services.Collector, log)
+	if err != nil {
+		log.Error("cannot init collector adapter", "error", err)
+	}
+
+	pingUseCase := usecase.NewPing(processorClient, collectorClient)
 
 	mux := http.NewServeMux()
 	AddRoutes(mux, log, pingUseCase)
