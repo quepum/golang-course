@@ -52,6 +52,7 @@ func main() {
 
 	if err := run(ctx); err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
+		cancel()
 		os.Exit(1)
 	}
 }
