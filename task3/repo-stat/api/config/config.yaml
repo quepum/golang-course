@@ -10,3 +10,5 @@ logger:
 
 services:
   subscriber: "localhost:8081"
+  processor: "localhost:8082"
+  collector: "localhost:8083"
