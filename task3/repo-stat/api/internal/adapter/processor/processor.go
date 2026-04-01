@@ -42,6 +42,12 @@ func (c *Client) Ping(ctx context.Context) domain.PingStatus {
 	return domain.PingStatusUp
 }
 
+func (c *Client) GetRepoInfo(ctx context.Context, url string) (*processorv1.RepoInfoResponse, error) {
+	return c.pb.GetRepoInfo(ctx, &processorv1.RepoInfoRequest{
+		Url: url,
+	})
+}
+
 func (c *Client) Close() error {
 	if c.conn != nil {
 		return c.conn.Close()

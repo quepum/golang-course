@@ -9,14 +9,16 @@ import (
 
 type Server struct {
 	processorv1.UnimplementedProcessorServer
-	log  *slog.Logger
-	ping *usecase.Ping
+	log      *slog.Logger
+	ping     *usecase.Ping
+	repoInfo *usecase.RepoInfo
 }
 
-func NewServer(log *slog.Logger, ping *usecase.Ping) *Server {
+func NewServer(log *slog.Logger, ping *usecase.Ping, repoInfo *usecase.RepoInfo) *Server {
 	return &Server{
-		log:  log,
-		ping: ping,
+		log:      log,
+		ping:     ping,
+		repoInfo: repoInfo,
 	}
 }
 
@@ -28,5 +30,19 @@ func (s *Server) Ping(ctx context.Context, req *processorv1.PingRequest) (*proce
 }
 
 func (s *Server) GetRepoInfo(ctx context.Context, req *processorv1.RepoInfoRequest) (*processorv1.RepoInfoResponse, error) {
-	return nil, nil
+	s.log.Info("GetRepoInfo requested via Processor", "url", req.Url)
+
+	collectorResponse, err := s.repoInfo.Execute(ctx, req.Url)
+	if err != nil {
+		return nil, err
+	}
+	processorResponse := &processorv1.RepoInfoResponse{
+		FullName:    collectorResponse.FullName,
+		Description: collectorResponse.Description,
+		Stars:       collectorResponse.Stars,
+		Forks:       collectorResponse.Forks,
+		CreatedAt:   collectorResponse.CreatedAt,
+	}
+
+	return processorResponse, nil
 }

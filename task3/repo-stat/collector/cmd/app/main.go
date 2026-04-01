@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"repo-stat/collector/config"
+	"repo-stat/collector/internal/adapter/github"
 	grpccontroller "repo-stat/collector/internal/controller/grpc"
 	"repo-stat/collector/internal/usecase"
 	"repo-stat/platform/grpcserver"
@@ -26,7 +27,10 @@ func run(ctx context.Context) error {
 	log.Debug("debug messages are enabled")
 
 	pingUseCase := usecase.NewPing()
-	collectorServer := grpccontroller.NewServer(log, pingUseCase)
+	githubClient := github.NewClient()
+	repoInfoUseCase := usecase.NewRepoInfo(githubClient)
+
+	collectorServer := grpccontroller.NewServer(log, pingUseCase, repoInfoUseCase)
 
 	srv, err := grpcserver.New(cfg.GRPC.Address)
 	if err != nil {

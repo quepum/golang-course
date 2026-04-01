@@ -9,6 +9,7 @@ import (
 	"repo-stat/platform/grpcserver"
 	"repo-stat/platform/logger"
 	"repo-stat/processor/config"
+	"repo-stat/processor/internal/adapter/collector"
 	grpccontroller "repo-stat/processor/internal/controller/grpc"
 	"repo-stat/processor/internal/usecase"
 	processorv1 "repo-stat/proto/processor"
@@ -26,18 +27,28 @@ func run(ctx context.Context) error {
 	log.Debug("debug messages are enabled")
 
 	pingUseCase := usecase.NewPing()
-	pingServer := grpccontroller.NewServer(log, pingUseCase)
+
+	collectorClient, err := collector.NewClient(cfg.Services.Collector, log)
+	if err != nil {
+		log.Error("failed to create collector client", "error", err)
+		return fmt.Errorf("create collector client: %w", err)
+	}
+
+	repoInfoUseCase := usecase.NewRepoInfo(collectorClient)
+
+	serverHandler := grpccontroller.NewServer(log, pingUseCase, repoInfoUseCase)
 
 	srv, err := grpcserver.New(cfg.GRPC.Address)
 	if err != nil {
 		return fmt.Errorf("create grpc server: %w", err)
 	}
 
-	processorv1.RegisterProcessorServer(srv.GRPC(), pingServer)
+	processorv1.RegisterProcessorServer(srv.GRPC(), serverHandler)
 
 	if err := srv.Run(ctx); err != nil {
 		return fmt.Errorf("run grpc server: %w", err)
 	}
+
 	return nil
 }
 

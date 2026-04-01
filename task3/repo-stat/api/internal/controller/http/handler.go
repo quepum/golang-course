@@ -32,7 +32,7 @@ func NewHandler(ctx context.Context, log *slog.Logger, cfg config.Config) (http.
 	pingUseCase := usecase.NewPing(processorClient, collectorClient)
 
 	mux := http.NewServeMux()
-	AddRoutes(mux, log, pingUseCase)
+	AddRoutes(mux, log, pingUseCase, processorClient)
 
 	var handler http.Handler = mux
 	return handler, nil
