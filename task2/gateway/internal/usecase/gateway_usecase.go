@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"task2/domain"
+	"task2/gateway/domain"
 )
 
 type repoUseCase struct {

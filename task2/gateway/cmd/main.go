@@ -3,34 +3,22 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	_ "task2/docs/swagger"
-	"task2/internal/gateway/adapter"
-	"task2/internal/gateway/handler"
-	"task2/internal/gateway/usecase"
+	"task2/gateway/internal/adapter"
+	"task2/gateway/internal/handler"
+	"task2/gateway/internal/usecase"
+	"task2/pkg/utils"
 
-	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
-
 func main() {
+	utils.LoadEnv()
 
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables or defaults")
-	}
-
-	port := getEnv("HTTP_PORT", ":8080")
-	collectorAddress := getEnv("COLLECTOR_ADDR", "localhost:50051")
+	port := utils.GetEnv(utils.EnvHTTPPort, utils.DefaultHTTPPort)
+	collectorAddress := utils.GetEnv(utils.EnvCollectorAddr, utils.DefaultCollectorAddr)
 
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -48,8 +36,8 @@ func main() {
 	uc := usecase.NewRepoUseCase(repoAdapter)
 	httpHandler := handler.NewHTTPServer(uc)
 
-	http.HandleFunc("/repos/", httpHandler.GetRepoInfo)
 	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+	http.HandleFunc("/repos/", httpHandler.GetRepoInfo)
 
 	log.Printf("Gateway starting on %s", port)
 	if err := http.ListenAndServe(port, nil); err != nil {

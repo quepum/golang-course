@@ -3,30 +3,19 @@ package main
 import (
 	"log"
 	"net"
-	"os"
-	"task2/internal/collector/adapter"
-	"task2/internal/collector/handler"
-	"task2/internal/collector/usecase"
+	"task2/collector/internal/adapter"
+	"task2/collector/internal/handler"
+	"task2/collector/internal/usecase"
 	pb "task2/pkg/proto/v1"
+	"task2/pkg/utils"
 
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
-
 func main() {
+	utils.LoadEnv()
 
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables or defaults")
-	}
-
-	port := getEnv("COLLECTOR_PORT", ":50051")
+	port := utils.GetEnv(utils.EnvCollectorPort, utils.DefaultCollectorPort)
 
 	repoAdapter := adapter.NewGitHubRepo()
 	uc := usecase.NewRepoUseCase(repoAdapter)
@@ -39,6 +28,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterRepoServiceServer(grpcServer, grpcHandler)
+
 	log.Println("Starting server on port", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve on %s: %v", port, err)

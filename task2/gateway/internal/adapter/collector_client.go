@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"context"
-	"task2/domain"
+	"task2/gateway/domain"
 	pb "task2/pkg/proto/v1"
 
 	"google.golang.org/grpc"

@@ -6,9 +6,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"task2/domain"
+	"task2/collector/domain"
 	"time"
 )
+
+type githubResponse struct {
+	Name            string `json:"name"`
+	Description     string `json:"description"`
+	StargazersCount int    `json:"stargazers_count"` // Имя поля как в API
+	ForksCount      int    `json:"forks_count"`      // Имя поля как в API
+	CreatedAt       string `json:"created_at"`       // Приходит строкой
+}
 
 type githubRepo struct {
 	client      *http.Client
@@ -16,12 +24,10 @@ type githubRepo struct {
 }
 
 func NewGitHubRepo() domain.Repository {
-	newRepo := &githubRepo{
+	return &githubRepo{
 		client:      &http.Client{Timeout: 10 * time.Second},
 		standardUrl: "https://api.github.com/repos",
 	}
-
-	return newRepo
 }
 
 func (r *githubRepo) GetRepoInfo(ctx context.Context, owner, repo string) (*domain.RepoInfo, error) {
@@ -36,23 +42,27 @@ func (r *githubRepo) GetRepoInfo(ctx context.Context, owner, repo string) (*doma
 	if err != nil {
 		return nil, fmt.Errorf("error executing request: %w", err)
 	}
-
 	defer response.Body.Close()
 
+	body, _ := io.ReadAll(response.Body)
+
 	if response.StatusCode != http.StatusOK {
-		_, _ = io.ReadAll(response.Body)
 		if response.StatusCode == http.StatusNotFound {
 			return nil, domain.ErrRepoNotFound
 		}
-
-		return nil, fmt.Errorf("github api error: status %d", response.StatusCode)
+		return nil, fmt.Errorf("github api error: status %d, body: %s", response.StatusCode, string(body))
 	}
 
-	var result domain.RepoInfo
-	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("error decoding response: %w", err)
+	var rawDTO githubResponse
+	if err := json.Unmarshal(body, &rawDTO); err != nil {
+		return nil, fmt.Errorf("error decoding response to adapter model: %w", err)
 	}
 
-	return &result, nil
-
+	return &domain.RepoInfo{
+		Name:        rawDTO.Name,
+		Description: rawDTO.Description,
+		Stars:       rawDTO.StargazersCount,
+		Forks:       rawDTO.ForksCount,
+		CreatedAt:   rawDTO.CreatedAt,
+	}, nil
 }

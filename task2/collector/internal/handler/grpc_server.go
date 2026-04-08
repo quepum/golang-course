@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
-	"task2/domain"
+	"task2/collector/domain"
 	pb "task2/pkg/proto/v1"
 
 	"google.golang.org/grpc/codes"

@@ -5,8 +5,16 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-	"task2/domain"
+	"task2/gateway/domain"
 )
+
+type repoResponse struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Stars       int    `json:"stars"`
+	Forks       int    `json:"forks"`
+	CreatedAt   string `json:"created_at"`
+}
 
 type HttpServer struct {
 	uc domain.UseCase
@@ -54,8 +62,17 @@ func (h *HttpServer) GetRepoInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
+
+	response := repoResponse{
+		Name:        info.Name,
+		Description: info.Description,
+		Stars:       info.Stars,
+		Forks:       info.Forks,
+		CreatedAt:   info.CreatedAt,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(info); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}
