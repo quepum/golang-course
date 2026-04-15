@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"repo-stat/processor/internal/adapter/collector"
-	collectorv1 "repo-stat/proto/collector"
+	"repo-stat/processor/internal/domain"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ func NewRepoInfo(collClient *collector.Client) *RepoInfo {
 	return &RepoInfo{collClient: collClient}
 }
 
-func (u *RepoInfo) Execute(ctx context.Context, url string) (*collectorv1.RepoInfoResponse, error) {
+func (u *RepoInfo) Execute(ctx context.Context, url string) (*domain.Repository, error) {
 	owner, repo, err := parseURL(url)
 	if err != nil {
 		return nil, err

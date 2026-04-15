@@ -3,6 +3,7 @@ package collector
 import (
 	"context"
 	"log/slog"
+	"repo-stat/processor/internal/domain"
 	collectorv1 "repo-stat/proto/collector"
 
 	"google.golang.org/grpc"
@@ -27,11 +28,22 @@ func NewClient(address string, log *slog.Logger) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) GetRepoInfo(ctx context.Context, owner, repo string) (*collectorv1.RepoInfoResponse, error) {
-	return c.pb.GetRepoInfo(ctx, &collectorv1.RepoInfoRequest{
+func (c *Client) GetRepoInfo(ctx context.Context, owner, repo string) (*domain.Repository, error) {
+	resp, err := c.pb.GetRepoInfo(ctx, &collectorv1.RepoInfoRequest{
 		Owner: owner,
 		Repo:  repo,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Repository{
+		FullName:    resp.FullName,
+		Description: resp.Description,
+		Stars:       int(resp.Stars),
+		Forks:       int(resp.Forks),
+		CreatedAt:   resp.CreatedAt,
+	}, nil
 }
 
 func (c *Client) Close() error {

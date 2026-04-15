@@ -42,10 +42,21 @@ func (c *Client) Ping(ctx context.Context) domain.PingStatus {
 	return domain.PingStatusUp
 }
 
-func (c *Client) GetRepoInfo(ctx context.Context, url string) (*processorv1.RepoInfoResponse, error) {
-	return c.pb.GetRepoInfo(ctx, &processorv1.RepoInfoRequest{
+func (c *Client) GetRepoInfo(ctx context.Context, url string) (*domain.Repository, error) {
+	resp, err := c.pb.GetRepoInfo(ctx, &processorv1.RepoInfoRequest{
 		Url: url,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Repository{
+		FullName:    resp.FullName,
+		Description: resp.Description,
+		Stars:       resp.Stars,
+		Forks:       resp.Forks,
+		CreatedAt:   resp.CreatedAt,
+	}, nil
 }
 
 func (c *Client) Close() error {

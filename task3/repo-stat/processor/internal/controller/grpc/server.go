@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"log/slog"
+	"repo-stat/processor/internal/dto"
 	"repo-stat/processor/internal/usecase"
 	processorv1 "repo-stat/proto/processor"
 )
@@ -32,17 +33,24 @@ func (s *Server) Ping(ctx context.Context, req *processorv1.PingRequest) (*proce
 func (s *Server) GetRepoInfo(ctx context.Context, req *processorv1.RepoInfoRequest) (*processorv1.RepoInfoResponse, error) {
 	s.log.Info("GetRepoInfo requested via Processor", "url", req.Url)
 
-	collectorResponse, err := s.repoInfo.Execute(ctx, req.Url)
+	repo, err := s.repoInfo.Execute(ctx, req.Url)
 	if err != nil {
 		return nil, err
 	}
-	processorResponse := &processorv1.RepoInfoResponse{
-		FullName:    collectorResponse.FullName,
-		Description: collectorResponse.Description,
-		Stars:       collectorResponse.Stars,
-		Forks:       collectorResponse.Forks,
-		CreatedAt:   collectorResponse.CreatedAt,
+
+	repoDTO := dto.RepoResponse{
+		FullName:    repo.FullName,
+		Description: repo.Description,
+		Stars:       int32(repo.Stars),
+		Forks:       int32(repo.Forks),
+		CreatedAt:   repo.CreatedAt,
 	}
 
-	return processorResponse, nil
+	return &processorv1.RepoInfoResponse{
+		FullName:    repoDTO.FullName,
+		Description: repoDTO.Description,
+		Stars:       repoDTO.Stars,
+		Forks:       repoDTO.Forks,
+		CreatedAt:   repoDTO.CreatedAt,
+	}, nil
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"repo-stat/collector/internal/adapter/github"
-	collectorv1 "repo-stat/proto/collector"
+	"repo-stat/collector/internal/domain"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,7 +18,7 @@ func NewRepoInfo(ghClient *github.Client) *RepoInfo {
 	return &RepoInfo{ghClient: ghClient}
 }
 
-func (u *RepoInfo) Execute(ctx context.Context, owner, repo string) (*collectorv1.RepoInfoResponse, error) {
+func (u *RepoInfo) Execute(ctx context.Context, owner, repo string) (*domain.Repository, error) {
 	ghRepo, err := u.ghClient.GetRepoInfo(ctx, owner, repo)
 	if err != nil {
 		errMsg := err.Error()
@@ -31,11 +31,11 @@ func (u *RepoInfo) Execute(ctx context.Context, owner, repo string) (*collectorv
 		return nil, status.Error(codes.Internal, fmt.Errorf("github api error: %w", err).Error())
 	}
 
-	return &collectorv1.RepoInfoResponse{
+	return &domain.Repository{
 		FullName:    ghRepo.FullName,
 		Description: ghRepo.Description,
-		Stars:       int32(ghRepo.Stars),
-		Forks:       int32(ghRepo.Forks),
+		Stars:       ghRepo.Stars,
+		Forks:       ghRepo.Forks,
 		CreatedAt:   ghRepo.CreatedAt,
 	}, nil
 }

@@ -5,11 +5,6 @@ import (
 	"repo-stat/api/internal/domain"
 )
 
-type Pinger interface {
-	Ping(ctx context.Context) domain.PingStatus
-	GetName() string
-}
-
 type Ping struct {
 	pingers []Pinger
 }
@@ -38,7 +33,7 @@ func (u *Ping) Execute(ctx context.Context) domain.PingResult {
 
 	overallStatus := "ok"
 	if !allUp {
-		overallStatus = "fail"
+		overallStatus = "degrated"
 	}
 
 	return domain.PingResult{

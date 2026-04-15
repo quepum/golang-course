@@ -13,6 +13,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// NewRepoInfoHandler
+// @Summary      Get repository information
+// @Description  Returns statistics for a given GitHub repository URL
+// @Tags         repositories
+// @Produce      json
+// @Param        url   query     string  true  "GitHub Repository URL"
+// @Success      200   {object}  dto.RepoInfoResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      404   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /repositories/info [get]
 func NewRepoInfoHandler(log *slog.Logger, procClient *processor.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -38,8 +49,16 @@ func NewRepoInfoHandler(log *slog.Logger, procClient *processor.Client) http.Han
 			return
 		}
 
+		response := dto.RepoInfoResponse{
+			FullName:    resp.FullName,
+			Description: resp.Description,
+			Stars:       resp.Stars,
+			Forks:       resp.Forks,
+			CreatedAt:   resp.CreatedAt,
+		}
+
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(resp); err != nil {
+		if err := json.NewEncoder(w).Encode(response); err != nil {
 			log.Error("failed to encode response", "error", err)
 		}
 	}
