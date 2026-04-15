@@ -21,7 +21,6 @@ func NewHandler(ctx context.Context, log *slog.Logger, cfg config.Config) (http.
 
 	processorClient, err := processor.NewClient(cfg.Services.Processor, log)
 	if err != nil {
-		subscriberClient.Close()
 		log.Error("cannot init processor adapter", "error", err)
 		return nil, err
 	}
