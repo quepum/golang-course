@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"repo-stat/subscriber/internal/adapter/github"
 	"repo-stat/subscriber/internal/adapter/storage"
 	"repo-stat/subscriber/internal/domain"
@@ -33,7 +34,14 @@ func (sm *SubscriptionManager) AddSubscription(ctx context.Context, sub *domain.
 		return err
 	}
 
-	return sm.repo.AddSubscription(ctx, sub)
+	err = sm.repo.AddSubscription(ctx, sub)
+	if err != nil {
+		if errors.Is(err, domain.ErrDuplicateSubscription) {
+			return fmt.Errorf("subscription already exists")
+		}
+		return fmt.Errorf("failed to save subscription: %w", err)
+	}
+	return nil
 }
 
 func (sm *SubscriptionManager) ListSubscriptions(ctx context.Context) ([]domain.Subscription, error) {

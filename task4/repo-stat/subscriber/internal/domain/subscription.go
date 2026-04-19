@@ -1,5 +1,7 @@
 package domain
 
+import "errors"
+
 type Subscription struct {
 	ID    int32
 	Owner string
@@ -12,3 +14,5 @@ func (sub Subscription) IsValid() bool {
 	}
 	return true
 }
+
+var ErrDuplicateSubscription = errors.New("subscription already exists")

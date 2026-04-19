@@ -2,7 +2,11 @@ package storage
 
 import (
 	"context"
+	"errors"
+
 	"repo-stat/subscriber/internal/domain"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type Repository struct {
@@ -18,7 +22,16 @@ func (r *Repository) AddSubscription(ctx context.Context, sub *domain.Subscripti
 		Owner: sub.Owner,
 		Repo:  sub.Repo,
 	})
-	return err
+
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return domain.ErrDuplicateSubscription
+		}
+		return err
+
+	}
+	return nil
 }
 
 func (r *Repository) ListSubscriptions(ctx context.Context) ([]domain.Subscription, error) {
