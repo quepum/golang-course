@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS subscriptions(
+    id SERIAL PRIMARY KEY,
+    owner VARCHAR(255) NOT NULL,
+    repo VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(owner, repo)
+);
