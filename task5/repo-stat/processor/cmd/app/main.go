@@ -16,6 +16,9 @@ import (
 	"repo-stat/processor/internal/usecase"
 	processorv1 "repo-stat/proto/processor"
 
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -29,6 +32,8 @@ func run(ctx context.Context) error {
 
 	cfg := config.MustLoad(configPath)
 	log := logger.MustMakeLogger(cfg.Logger.LogLevel)
+	log.Info("loaded config", "kafka_broker", cfg.Kafka.Broker)
+
 	log.Info("starting processor server...", "addr", cfg.GRPC.Address)
 
 	pool, err := pgxpool.New(ctx, cfg.DB.DSN)

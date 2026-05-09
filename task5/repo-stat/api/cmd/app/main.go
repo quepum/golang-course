@@ -46,7 +46,7 @@ func run(ctx context.Context) error {
 // @title           Repository Stats API
 // @version         1.0
 // @description     API for managing repository subscriptions and fetching statistics
-// @host            localhost:8080
+// @host            localhost:28080
 // @BasePath        /api
 func main() {
 	ctx := context.Background()

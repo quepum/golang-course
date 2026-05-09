@@ -95,7 +95,7 @@ definitions:
           $ref: '#/definitions/dto.RepoStatItem'
         type: array
     type: object
-host: localhost:8080
+host: localhost:28080
 info:
   contact: {}
   description: API for managing repository subscriptions and fetching statistics
