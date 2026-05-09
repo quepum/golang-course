@@ -27,8 +27,6 @@ func run(ctx context.Context) error {
 	cfg := config.MustLoad(configPath)
 	log := logger.MustMakeLogger(cfg.Logger.LogLevel)
 
-	log.Info("loaded config", "kafka_broker", cfg.Kafka.Broker)
-
 	githubClient := github.NewClient()
 	subClient, err := subscriber.NewClient(cfg.Services.Subscriber, log)
 	if err != nil {

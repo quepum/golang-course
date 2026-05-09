@@ -1,5 +1,7 @@
 package domain
 
+import "errors"
+
 type Repository struct {
 	FullName    string
 	Description string
@@ -7,3 +9,5 @@ type Repository struct {
 	Forks       int
 	CreatedAt   string
 }
+
+var ErrDataNotReady = errors.New("repository data is not ready yet")

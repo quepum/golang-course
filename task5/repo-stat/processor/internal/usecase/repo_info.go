@@ -14,11 +14,11 @@ import (
 )
 
 type RepoInfo struct {
-	storage       *storage.Repo
+	storage       RepoStorage
 	kafkaProducer KafkaProducer
 }
 
-func NewRepoInfo(storage *storage.Repo, kafkaProducer KafkaProducer) *RepoInfo {
+func NewRepoInfo(storage RepoStorage, kafkaProducer KafkaProducer) *RepoInfo {
 	return &RepoInfo{
 		storage:       storage,
 		kafkaProducer: kafkaProducer,
@@ -58,7 +58,7 @@ func (u *RepoInfo) Execute(ctx context.Context, url string) (*domain.Repository,
 		return nil, fmt.Errorf("failed to send fetch request to kafka: %w", err)
 	}
 
-	return nil, errors.New("try again later")
+	return nil, domain.ErrDataNotReady
 }
 
 func parseURL(url string) (owner, repo string, err error) {

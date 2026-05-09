@@ -2,7 +2,9 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"log/slog"
+	"repo-stat/processor/internal/domain"
 	"repo-stat/processor/internal/dto"
 	"repo-stat/processor/internal/usecase"
 	processorv1 "repo-stat/proto/processor"
@@ -38,7 +40,10 @@ func (s *Server) GetRepoInfo(ctx context.Context, req *processorv1.RepoInfoReque
 
 	repo, err := s.repoInfo.Execute(ctx, req.Url)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, domain.ErrDataNotReady) {
+			return nil, status.Error(codes.NotFound, "repository data is being collected, please try again later")
+		}
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	repoDTO := dto.RepoResponse{
