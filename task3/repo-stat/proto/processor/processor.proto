@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package processor.v1;
+
+option go_package = "repo-stat/proto/processor;processorv1";
+
+service Processor {
+  rpc Ping(PingRequest) returns (PingResponse);
+  rpc GetRepoInfo(RepoInfoRequest) returns (RepoInfoResponse);
+}
+
+message PingRequest {
+}
+
+message PingResponse {
+  string reply = 1;
+}
+
+message RepoInfoRequest {
+  string url = 1;
+}
+
+message RepoInfoResponse {
+  string full_name = 1;
+  string description = 2;
+  int32 stars = 3;
+  int32 forks = 4;
+  string created_at = 5;
+}
