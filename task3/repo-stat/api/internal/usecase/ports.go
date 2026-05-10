@@ -5,6 +5,7 @@ import (
 	"repo-stat/api/internal/domain"
 )
 
-type SubscriberPinger interface {
-	Ping(ctx context.Context) (domain.PingStatus, error)
+type Pinger interface {
+	Ping(ctx context.Context) domain.PingStatus
+	GetName() string
 }
