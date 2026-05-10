@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"repo-stat/api/config"
+	_ "repo-stat/api/docs"
 	"repo-stat/api/internal/controller/http"
 	"repo-stat/platform/httpserver"
 	"repo-stat/platform/logger"
@@ -42,6 +43,11 @@ func run(ctx context.Context) error {
 	return nil
 }
 
+// @title           Repository Stats API
+// @version         1.0
+// @description     Service for collecting and processing GitHub repository statistics.
+// @host            localhost:8080
+// @BasePath        /api
 func main() {
 	ctx := context.Background()
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
