@@ -1,0 +1,100 @@
+basePath: /api
+definitions:
+  domain.PingStatus:
+    enum:
+    - up
+    - down
+    type: string
+    x-enum-varnames:
+    - PingStatusUp
+    - PingStatusDown
+  domain.ServicePingResult:
+    properties:
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/domain.PingStatus'
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  dto.PingResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/domain.ServicePingResult'
+        type: array
+      status:
+        type: string
+    type: object
+  dto.RepoInfoResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      forks:
+        type: integer
+      full_name:
+        type: string
+      stars:
+        type: integer
+    type: object
+host: localhost:28080
+info:
+  contact: {}
+  description: Service for collecting and processing GitHub repository statistics.
+  title: Repository Stats API
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      description: Check the health status of internal services (processor, subscriber)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PingResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Ping services
+      tags:
+      - system
+  /repositories/info:
+    get:
+      description: Returns statistics for a given GitHub repository URL
+      parameters:
+      - description: GitHub Repository URL
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RepoInfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get repository information
+      tags:
+      - repositories
+swagger: "2.0"
