@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package subscriber.v1;
+
+option go_package = "yadro.com/course/proto/gen/go/subscriber/v1;subscriberv1";
+
+service Subscriber {
+  rpc Ping(PingRequest) returns (PingResponse);
+  rpc AddSubscription(AddSubscriptionRequest) returns (AddSubscriptionResponse);
+  rpc RemoveSubscription(RemoveSubscriptionRequest) returns (RemoveSubscriptionResponse);
+  rpc ListSubscriptions(ListSubscriptionsRequest) returns (ListSubscriptionsResponse);
+}
+
+message PingRequest {
+}
+
+message PingResponse {
+  string reply = 1;
+}
+
+message Subscription {
+  string owner = 1;
+  string repo = 2;
+}
+
+message AddSubscriptionRequest{
+  string owner = 1;
+  string repo = 2;
+}
+
+message AddSubscriptionResponse{
+  bool status = 1;
+  string message = 2;
+}
+
+message RemoveSubscriptionRequest{
+  string owner = 1;
+  string repo = 2;
+}
+
+message RemoveSubscriptionResponse{
+  bool status = 1;
+}
+
+message ListSubscriptionsRequest{
+}
+
+message ListSubscriptionsResponse{
+  repeated Subscription subscriptions = 1;
+}

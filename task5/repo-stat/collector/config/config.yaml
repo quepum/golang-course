@@ -1,0 +1,18 @@
+app:
+  app_name: "repo-stat-collector"
+
+grpc:
+  address: ":8083"
+  timeout: "5s"
+
+logger:
+  log_level: "DEBUG"
+
+services:
+  subscriber: "subscriber:8080"
+
+kafka:
+  broker: "kafka:9092"
+  topic_request: "repo-fetch-request"
+  topic_result: "repo-fetch-result"
+  group_id: "collector-group"

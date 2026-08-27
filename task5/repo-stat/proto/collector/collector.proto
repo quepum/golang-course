@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package collector.v1;
+
+option go_package = "repo-stat/proto/collector;collectorv1";
+
+service Collector {
+  rpc Ping(PingRequest) returns (PingResponse);
+}
+
+message PingRequest {
+}
+
+message PingResponse {
+  string reply = 1;
+}
+

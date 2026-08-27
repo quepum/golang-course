@@ -45,7 +45,7 @@
 Processor становится основным сервисом для работы с данными о репозиториях.
 
 Он должен:
- 
+
 - быть **producer/consumer** для Kafka,
 - хранить информацию о репозиториях в **PostgreSQL**,
 - по запросу:
@@ -88,7 +88,7 @@ Collector остается сервисом, который инкапсулир
 ---
 
 ## Требования
-    
+
 - Взаимодействие между **Processor** и **Collector** — строго **через Kafka**.
 - В каждом сервисе должно сохраняться разделение на слои:
     - **Domain**
@@ -96,7 +96,7 @@ Collector остается сервисом, который инкапсулир
     - **Controller/Handler**
     - **Adapter/Repository**
 - **Processor** должен использовать **PostgreSQL** для хранения информации о репозиториях.
-- Актуальное описание Swagger для api gateway 
+- Актуальное описание Swagger для api gateway
 - Для работы с PostgreSQL использовать:
     - [**sqlc**](https://docs.sqlc.dev/en/latest/tutorials/getting-started-postgresql.html)
     - [**golang-migrate**](https://github.com/golang-migrate/migrate)
