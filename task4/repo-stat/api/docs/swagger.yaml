@@ -1,0 +1,258 @@
+basePath: /api
+definitions:
+  domain.PingStatus:
+    enum:
+    - up
+    - down
+    type: string
+    x-enum-varnames:
+    - PingStatusUp
+    - PingStatusDown
+  domain.ServicePingResult:
+    properties:
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/domain.PingStatus'
+    type: object
+  dto.AddSubscriptionRequest:
+    properties:
+      owner:
+        type: string
+      repo:
+        type: string
+    type: object
+  dto.AddSubscriptionResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: boolean
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  dto.ListSubscriptionsResponse:
+    properties:
+      subscriptions:
+        items:
+          $ref: '#/definitions/dto.SubscriptionItem'
+        type: array
+    type: object
+  dto.PingResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/domain.ServicePingResult'
+        type: array
+      status:
+        type: string
+    type: object
+  dto.RemoveSubscriptionResponse:
+    properties:
+      status:
+        type: boolean
+    type: object
+  dto.RepoInfoResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      forks:
+        type: integer
+      full_name:
+        type: string
+      stars:
+        type: integer
+    type: object
+  dto.RepoStatItem:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      forks:
+        type: integer
+      full_name:
+        type: string
+      stars:
+        type: integer
+    type: object
+  dto.SubscriptionItem:
+    properties:
+      owner:
+        type: string
+      repo:
+        type: string
+    type: object
+  dto.SubscriptionsInfoResponse:
+    properties:
+      stats:
+        items:
+          $ref: '#/definitions/dto.RepoStatItem'
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing repository subscriptions and fetching statistics
+  title: Repository Stats API
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      description: Check the health status of internal services (processor, subscriber)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PingResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Ping services
+      tags:
+      - system
+  /repositories/info:
+    get:
+      description: Returns statistics for a given GitHub repository URL
+      parameters:
+      - description: GitHub Repository URL
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RepoInfoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get repository information
+      tags:
+      - repositories
+  /subscriptions:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of all repositories currently subscribed by the
+        user from the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of subscribed repositories
+          schema:
+            $ref: '#/definitions/dto.ListSubscriptionsResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get list of all active subscriptions
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Adds a subscription to a GitHub repository. Validates that the
+        repository exists on GitHub before saving to the database.
+      parameters:
+      - description: Owner and Repository name
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Subscription added successfully
+          schema:
+            $ref: '#/definitions/dto.AddSubscriptionResponse'
+        "400":
+          description: Invalid JSON format or repository not found on GitHub
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Add a new repository subscription
+      tags:
+      - subscriptions
+  /subscriptions/{owner}/{repo}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a subscription for a given owner and repository name from
+        the database.
+      parameters:
+      - description: GitHub Owner username
+        in: path
+        name: owner
+        required: true
+        type: string
+      - description: Repository name
+        in: path
+        name: repo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Subscription removed successfully
+          schema:
+            $ref: '#/definitions/dto.RemoveSubscriptionResponse'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Remove a specific subscription
+      tags:
+      - subscriptions
+  /subscriptions/info:
+    get:
+      consumes:
+      - application/json
+      description: Fetches real-time statistics (stars, forks, description) from GitHub
+        for every repository in the subscription list.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Statistics for all subscribed repos
+          schema:
+            $ref: '#/definitions/dto.SubscriptionsInfoResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get statistics for all subscribed repositories
+      tags:
+      - subscriptions
+swagger: "2.0"
